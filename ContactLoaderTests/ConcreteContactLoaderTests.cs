@@ -1,13 +1,14 @@
-﻿using FakeItEasy;
-
+﻿using ContactLoader;
+using FakeItEasy;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace ContactLoader.Tests
+namespace ContactLoaderTests
 {
 	[TestClass()]
 	public class ConcreteContactLoaderTests
 	{
 		private IContactReader reader;
+		private ConcreteContactLoader ccLoader;
 
 		[TestInitialize]
 		public void SetupBeforeEachTest()
@@ -15,14 +16,19 @@ namespace ContactLoader.Tests
 			// Arrange
 			reader = A.Fake<IContactReader>();
 			A.CallTo(() => reader.LoadContactDataFromSource("")).Returns(GetTestContactData());
+			ccLoader = new ConcreteContactLoader(reader);
+		}
+
+		[TestCleanup]
+		public void CleanupAfterEachTest()
+		{
+			reader = null;
+			ccLoader = null;
 		}
 
 		[TestMethod]
 		public void ConcreteLoader_LoadContacts_CallToReader_Occured()
 		{
-			// Arrange
-			ConcreteContactLoader ccLoader = new ConcreteContactLoader(reader);
-
 			// Act
 			Contact[] contacts = ccLoader.LoadContacts();
 
@@ -34,9 +40,6 @@ namespace ContactLoader.Tests
 		[TestMethod()]
 		public void ConcreteLoader_LoadContacts_HasCorrectCount()
 		{
-			// Arrange
-			ConcreteContactLoader ccLoader = new ConcreteContactLoader(reader);
-
 			// Act
 			Contact[] contacts = ccLoader.LoadContacts();
 
@@ -48,7 +51,7 @@ namespace ContactLoader.Tests
 
 		private Contact[] GetTestContactData()
 		{
-			return new Contact[]
+			return new[]
 			{
 				new Contact() {FirstName = "A",LastName =  "1", PhoneNumber = "111-111-1111"},
 				new Contact() {FirstName = "B", LastName = "2", PhoneNumber = "222-222-2222"}
